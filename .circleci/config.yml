@@ -173,25 +173,46 @@ jobs:
               --stack-name "back-end-${CIRCLE_WORKFLOW_ID:0:7}" \
               --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"  
               #exit 1
+      
       - run:
-          name: Add back-end ip to ansible inventory
+          name: Add EC2 ip to ansible inventory
           command: |
-            # Your code here
-
-            backendip=$(aws ec2 describe-instances \
-              --query "Reservations[*].Instances[*].PublicIpAddress" \
-              --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" \
-              --output=text)
-            echo $backendip >> .circleci/ansible/inventory.txt
-            curl -H "Content-Type: text/plain" -H "token: a6799e5b-dcb5-45f6-b3f3-6cb9db85f3ac" --request PUT --data $backendip https://api.memstash.io/values/backendip
-            cat .circleci/ansible/inventory.txt
-            # exit 1
+            yum -y install tar gzip
+            echo "[web]" > ~/project/.circleci/ansible/inventory.txt
+            aws ec2 describe-instances \
+            --query 'Reservations[*].Instances[*].PublicIpAddress' \
+            --filters "Name=tag:Name,Values=Capstone-${CIRCLE_WORKFLOW_ID:0:7}" \
+            --output text >> ~/project/.circleci/ansible/inventory.txt
+            echo ${CIRCLE_WORKFLOW_ID:0:7}
       - persist_to_workspace:
           root: ~/
           paths:
             - project/.circleci/ansible/inventory.txt
             
-            
+  Configure-infrastructure:
+    docker:
+      - image: python:3.7-alpine3.11
+
+    steps:
+      - checkout
+      - add_ssh_keys:
+           fingerprints: ["0a:e9:05:66:80:4b:67:9c:a5:60:7e:59:71:49:6b:c7"]
+  
+      - attach_workspace:       # attach workspace.
+         at: ~/
+      - run: cat ~/project/.circleci/ansible/inventory.txt   
+      - run:
+          name: Install dependencies
+          command: |
+            apk add --update ansible 
+      - run:
+          name: Configure server
+          command: |
+            ansible-playbook ~/project/.circleci/ansible/configure-server.yml -i ~/project/.circleci/ansible/inventory.txt 
+      # Here's where you will add some code to rollback on failure      
+      - destroy-environment:
+          WorkflowID: "${CIRCLE_WORKFLOW_ID}" 
+
   configure-infrastructure:
     docker:
       # Docker image here that supports Ansible
@@ -211,13 +232,8 @@ jobs:
           command: |
             apk add --update tar gzip ansible nodejs npm curl
             pip install awscli
-      - run:
-          name: Set up inventory file
-          command: |
-            cd .circleci/ansible
-            URLS=$(curl -H "token: a6799e5b-dcb5-45f6-b3f3-6cb9db85f3ac" --request GET https://api.memstash.io/values/backendip)
-            echo "$URLS" >> inventory.txt
-            cat inventory.txt
+      - run: cat .circleci/ansible/inventory.txt
+  
       - run:
           name: Configure server with ansible
           #no_output_timeout: 3m
