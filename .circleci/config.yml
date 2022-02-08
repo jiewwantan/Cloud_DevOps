@@ -1,0 +1,360 @@
+# Use the latest 2.1 version of CircleCI pipeline process engine.
+# See: https://circleci.com/docs/2.0/configuration-reference
+version: 2.1
+
+
+commands:
+  destroy-environment:
+    description: Destroy Udacity-DevOps-Engineer-Capstone cloudformation stacks given a workflow ID.
+    parameters:
+      # Add parameter here  
+      workflow_id:
+        type: string
+    steps:
+      - run:
+          name: Destroy environments
+          when: on_fail
+          command: |
+            echo "Destroying environment udapeople-${CIRCLE_WORKFLOW_ID:0:7}"
+            #aws cloudformation delete-stack --stack-name back-end-${CIRCLE_WORKFLOW_ID:0:7}
+
+  print_pipeline_id:
+    description: "A very simple command to print workflow ID"
+    parameters:
+      id:
+        type: string
+    steps:
+      - run:
+          name: "print workflow ID"
+          command: echo <<parameters.id>>
+      
+
+jobs:
+  print-workflow-id:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - checkout
+      - print_pipeline_id:
+          id: <<pipeline.id>>
+          
+  lint-Python:
+    docker:
+      # specify the version you desire here
+      - image: python:3.7.3-stretch
+    working_directory: ~/repo
+    steps:
+      - checkout
+      - run:
+          name: install dependencies
+          command: |
+            python3 -m venv venv
+            . venv/bin/activate
+            pip install -r requirements.txt
+      # run lints!
+      - run:
+          name: run python lint
+          command: |
+            . venv/bin/activate
+            pylint --disable=R,C,W1203,W1202 app.py
+            
+  lint-Dockerfile:
+    docker:
+      - image: python:3.7.3-stretch
+
+    working_directory: ~/repo
+
+    steps:
+      - checkout
+
+      - run:
+          name: install dependencies
+          command: |
+            python3 -m venv venv
+            . venv/bin/activate
+            #install hadolint
+            wget -O /bin/hadolint https://github.com/hadolint/hadolint/releases/download/v1.16.3/hadolint-Linux-x86_64
+            chmod +x /bin/hadolint
+        
+      # run lints!
+      - run:
+          name: run docker lint
+          command: |
+            . venv/bin/activate
+            hadolint Dockerfile
+
+#################################################
+
+  test-app:
+    docker:
+      # specify the version you desire here
+      - image: python:3.7.3-stretch
+    working_directory: ~/repo
+    steps:
+      - checkout
+      - run:
+          name: install dependencies
+          command: |
+            python3 -m venv venv
+            . venv/bin/activate
+            pip install -r requirements.txt
+      # run lints!
+      - run:
+          name: run pytest app.py
+          command: |
+            . venv/bin/activate
+            pytest test_api.py
+
+#################################################
+
+  security-app:
+    docker:
+      # specify the version you desire here
+      - image: python:3.7.3-stretch
+    working_directory: ~/repo
+    steps:
+      - checkout
+      - run:
+          name: install dependencies
+          command: |
+            python3 -m venv venv
+            . venv/bin/activate
+            pip install -r requirements.txt
+      # run lints!
+      - run:
+          name: run security test bandit app.py
+          command: |
+            . venv/bin/activate
+            bandit app.py --skip B104,B201
+#################################################
+
+  build-image:
+    docker:
+      - image: circleci/golang:1.15
+        auth:
+          username: $DOCKER_USR
+          password: $DOCKER_PWD  # context / project UI env-var reference
+    steps:
+      - checkout
+      # ... steps for building/testing app ...
+
+      - setup_remote_docker:
+          version: 19.03.13
+          docker_layer_caching: true
+
+      # build and push Docker image
+      - run: 
+          name: run build image
+          command: |
+              TAG=0.1.$CIRCLE_BUILD_NUM
+              #docker build -t CircleCI-Public/circleci-demo-docker:$TAG .
+              #docker push CircleCI-Public/circleci-demo-docker:$TAG
+              docker build --tag=jiewwantan/Cloud_DevOps:latest .
+              echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
+              docker push jiewwantan/Cloud_DevOps:latest
+
+#################################################          
+  deploy-infrastructure:
+    docker:
+      # Docker image here that supports AWS CLI
+      - image: amazon/aws-cli
+    steps:
+      # Checkout code from git
+      - checkout
+      - run:
+          name: Install tar
+          command: yum install -y tar gzip   
+      - run:
+          name: Ensure back-end infrastructure exists
+          command: |
+            aws cloudformation deploy \
+              --template-file .circleci/files/backend.yml \
+              --tags project=Udacity-DevOps-Capstone \
+              --stack-name "back-end-${CIRCLE_WORKFLOW_ID:0:7}" \
+              --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"  
+              #exit 1
+      - run:
+          name: Add back-end ip to ansible inventory
+          command: |
+            # Your code here
+
+            backendip=$(aws ec2 describe-instances \
+              --query "Reservations[*].Instances[*].PublicIpAddress" \
+              --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" \
+              --output=text)
+            echo $backendip >> .circleci/ansible/inventory.txt
+            curl -H "Content-Type: text/plain" -H "token: a6799e5b-dcb5-45f6-b3f3-6cb9db85f3ac" --request PUT --data $backendip https://api.memstash.io/values/backendip
+            cat .circleci/ansible/inventory.txt
+            # exit 1
+      - persist_to_workspace:
+          root: ~/
+          paths:
+            - project/.circleci/ansible/inventory.txt
+            
+            
+  configure-infrastructure:
+    docker:
+      # Docker image here that supports Ansible
+      - image: python:3.7-alpine3.11
+    steps:
+      # Checkout code from git
+      - checkout
+      # Add ssh keys with fingerprint again
+      - add_ssh_keys:
+          fingerprints:
+              - "0a:e9:05:66:80:4b:67:9c:a5:60:7e:59:71:49:6b:c7"
+      # attach workspace
+      - attach_workspace:
+            at: ~/project
+      - run:
+          name: Install dependencies
+          command: |
+            apk add --update tar gzip ansible nodejs npm curl
+            pip install awscli
+      - run:
+          name: Set up inventory file
+          command: |
+            cd .circleci/ansible
+            URLS=$(curl -H "token: a6799e5b-dcb5-45f6-b3f3-6cb9db85f3ac" --request GET https://api.memstash.io/values/backendip)
+            echo "$URLS" >> inventory.txt
+            cat inventory.txt
+      - run:
+          name: Configure server with ansible
+          #no_output_timeout: 3m
+          command: |
+            echo "Start Ansible"
+            cd .circleci/ansible
+            ansible-playbook -i inventory.txt configure-server.yml
+            cat inventory.txt
+            #cat configure-server.yml
+      # Here's where you will add some code to rollback on failure  
+      
+  smoke-test:
+    docker:
+      # Lightweight Docker image 
+      - image: python:3.7-alpine3.11
+    steps:
+      # Checkout code from git
+      - checkout
+      - run:
+          name: Install dependencies
+          command: |
+            # your code here
+            apk add --update tar gzip ansible nodejs npm curl zip
+            pip install awscli
+      - run:
+          name: Backend smoke test
+          command: |
+            BACKEND_IP=$(aws ec2 describe-instances \
+              --query "Reservations[*].Instances[*].PublicIpAddress" \
+              --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" \
+              --output=text)
+            export API_URL="http://${BACKEND_IP}:8000"
+            echo "${API_URL}"
+            if curl "${API_URL}" | grep "World"
+            then
+                return 0
+            else
+                return 1
+            fi
+      # Here's where you will add some code to rollback on failure delete new env 
+      - destroy-environment:
+          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}        
+            
+          
+  cleanup:
+      docker:
+        # Docker image here that supports AWS CLI
+        - image: amazon/aws-cli
+      steps:
+        # Checkout code from git
+        - checkout
+        - run:
+            name: Install dependencies
+            command: |
+              yum -y install tar gzip 
+        - attach_workspace:
+              at: ~/project
+        - run:
+            name: Get old stack workflow id
+            command: |
+              # your code here will get all stack names including the new one
+              #export OldWorkflowID=$(aws cloudformation list-exports --query "Exports[?Name==\`WorkflowID\`].Value" --no-paginate --output text)
+              #echo OldWorkflowID: "${OldWorkflowID}"
+              #put the list of stacks here
+              export STACKS=($(aws cloudformation list-stacks --query "StackSummaries[*].StackName" --stack-status-filter CREATE_COMPLETE --no-paginate --output text))
+              #echo Stacks: ${STACKS[@]}
+              for stack in ${STACKS[@]}; do
+                  if [[ $stack == *"${CIRCLE_WORKFLOW_ID:0:7}"* ]]
+                    then
+                      echo "New Stack Don't delete"
+                      echo "$stack"
+                    else
+                      if [[ "$stack" == *"-Udacity-"* ]]; then
+                        #echo "Old Stack to be deleted"
+                        echo "$stack"
+                        export OldWorkflowID=${stack##*-}
+                        echo $OldWorkflowID
+                        #aws cloudformation delete-stack --stack-name "back-end-${OldWorkflowID}"
+                        #aws s3 rm "s3://udapeople-${OldWorkflowID}" --recursive
+                        #aws cloudformation delete-stack --stack-name "front-end-${OldWorkflowID}"
+                      fi
+                  fi
+              done
+
+
+workflows:
+  default:
+    jobs:
+      - print-workflow-id:
+            filters:
+              branches:
+                only: [dev]
+      - lint-Python:
+            requires: [print-workflow-id]
+            filters:
+              branches:
+                only: [dev]
+      - lint-Dockerfile:
+            requires: [print-workflow-id]
+            filters:
+              branches:
+                only: [dev]
+      - test-app:
+            requires: [lint-Python, lint-Dockerfile]
+            filters:
+              branches:
+                only: [dev]
+      - security-app:
+            requires: [test-app]
+            filters:
+              branches:
+                only: [dev] 
+      - build-image:
+            requires: [security-app]
+            filters:
+              branches:
+                only: [dev]
+              
+      - deploy-infrastructure:
+            #requires: [build-image]
+            filters:
+              branches:
+                only: [main]  
+                
+      - configure-infrastructure:
+            requires: [deploy-infrastructure]
+            filters:
+              branches:
+                only: [main]
+
+      - smoke-test:
+            requires: [configure-infrastructure]
+            filters:
+              branches:
+                only: [main]   
+      - cleanup:
+            requires: [smoke-test]
+            filters:
+              branches:
+                only: [main]   

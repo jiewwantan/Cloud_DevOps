@@ -1,0 +1,65 @@
+      
+  - name: "Install Kubectl"
+    shell: |
+        curl -LO https://storage.googleapis.com/kubernetes-release/release/`curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl
+        chmod +x kubectl
+        sudo mv kubectl  /usr/local/bin/
+        kubectl version --client -o json
+
+  - name: "Install Docker"
+    shell: |
+        #sudo apt install docker.io
+        #sudo apt-get install -y docker.io
+        sudo apt-get update && sudo apt-get install docker.io -y
+    
+  - name: "Install Minikube"
+    shell: |
+        wget https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
+        chmod +x minikube-linux-amd64
+        sudo mv minikube-linux-amd64 /usr/local/bin/minikube
+        minikube version
+        
+  
+  - name: "Add user Minikube"
+    #become: yes
+    shell: |
+        #sudo usermod -aG docker $DOCKER_USR && newgrp docker
+        sudo groupadd docker
+        sudo gpasswd -a $DOCKER_USR docker
+        
+        
+  - name: "Start Minikube"
+    shell: |        
+        minikube start --driver=docker
+        #sudo -i
+        #minikube start
+        
+  - name: "Kubernetes Run"
+    shell: |
+        docker pull jiewwantan/Cloud_DevOps:latest      
+        kubectl run udacity-devops-engineer-capstone-deploy --image=jiewwantan/Cloud_DevOps --port=80 --labels app=udacity-devops-engineer-capstone-deploy
+        #kubectl create deployment udacity-devops-engineer-capstone-deploy2 --image=jiewwantan/Cloud_DevOps 
+        
+  - name: "wait 20 seconds for target connection to become reachable/usable."
+    wait_for_connection: 
+        delay: 20
+      
+  - name: "Kubernetes Port forwward"
+    shell: |
+        #nohup kubectl port-forward udacity-devops-engineer-capstone-deploy 8000:80 --address='0.0.0.0' &
+        nohup kubectl port-forward udacity-devops-engineer-capstone-deploy 8000:80 --address='0.0.0.0' --pod-running-timeout=1m0s &
+        #kubectl expose deployment udacity-devops-engineer-capstone-deploy2 --type=LoadBalancer --port=80 --target-port=8000
+        #kubectl expose pod udacity-devops-engineer-capstone-deploy --port=444 --name=udacity-devops-engineer-capstone-deploy
+        #kubectl expose pod udacity-devops-engineer-capstone-deploy --port=80 --target-port=80 --node-port=80 --name=udacity-devops-engineer-capstone-deploy
+
+        #echo "nohup applied"
+        #cat nohup.out
+    register: print_result
+
+  - name: print message
+    debug:
+      msg: "{{ print_result.stdout_lines }}"
+      
+  - name: "wait 60 seconds for target connection to become reachable/usable."
+    wait_for_connection: 
+        delay: 60
