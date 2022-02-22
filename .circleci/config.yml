@@ -199,40 +199,13 @@ jobs:
            fingerprints: ["0a:e9:05:66:80:4b:67:9c:a5:60:7e:59:71:49:6b:c7"]
   
       - attach_workspace:       # attach workspace.
-         at: ~/
-      - run: cat ~/project/.circleci/ansible/inventory.txt   
-      - run:
-          name: Install dependencies
-          command: |
-            apk add --update ansible 
-      - run:
-          name: Configure server
-          command: |
-            ansible-playbook ~/project/.circleci/ansible/configure-server.yml -i ~/project/.circleci/ansible/inventory.txt 
-      # Here's where you will add some code to rollback on failure      
-      - destroy-environment:
-          WorkflowID: "${CIRCLE_WORKFLOW_ID}" 
-
-  configure-infrastructure:
-    docker:
-      # Docker image here that supports Ansible
-      - image: python:3.7-alpine3.11
-    steps:
-      # Checkout code from git
-      - checkout
-      # Add ssh keys with fingerprint again
-      - add_ssh_keys:
-          fingerprints:
-              - "0a:e9:05:66:80:4b:67:9c:a5:60:7e:59:71:49:6b:c7"
-      # attach workspace
-      - attach_workspace:
-            at: ~/project
+         at: ~/project
+       
       - run:
           name: Install dependencies
           command: |
             apk add --update tar gzip ansible nodejs npm curl
-            pip install awscli
-      - run: cat .circleci/ansible/inventory.txt
+            pip install awscli 
   
       - run:
           name: Configure server with ansible
