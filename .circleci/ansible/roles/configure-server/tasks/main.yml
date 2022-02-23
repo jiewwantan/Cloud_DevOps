@@ -33,7 +33,7 @@
         sudo groupadd docker
         sudo usermod -aG docker $DOCKER_USR
         newgrp docker
-        #sudo gpasswd -a $DOCKER_USR docker
+        sudo gpasswd -a $DOCKER_USR docker
               
   - name: "Start Minikube"
     shell: |        
