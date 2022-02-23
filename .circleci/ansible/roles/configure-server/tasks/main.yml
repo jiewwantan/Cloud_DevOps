@@ -33,8 +33,8 @@
     shell: |   
         sudo groupadd docker1
         #sudo gpasswd -a jiewwantan docker1
-        echo groups
-        echo groups docker1
+        #echo groups
+        #echo groups docker1
         
   - name: "Add user Minikube 2"
     become: yes
