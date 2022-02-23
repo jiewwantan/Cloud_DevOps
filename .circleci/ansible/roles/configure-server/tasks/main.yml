@@ -36,7 +36,7 @@
   - name: "Add user Minikube 2"
     become: yes
     shell: |   
-        sudo usermod -a -G docker1 $DOCKER_USR
+        sudo usermod -a -G docker1 jiewwantan
       
   - name: "Add user Minikube 3"
     become: yes
