@@ -43,7 +43,8 @@
     shell: |     
         newgrp docker
         sudo gpasswd -a $DOCKER_USR docker
-              
+
+         
   - name: "Start Minikube"
     shell: |        
         minikube start --driver=docker
