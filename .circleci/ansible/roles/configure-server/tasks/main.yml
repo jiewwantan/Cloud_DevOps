@@ -37,6 +37,7 @@
     become: yes
     shell: |   
         sudo usermod -a -G docker1 jiewwantan
+        sudo reboot
       
   - name: "Add user Minikube 3"
     become: yes
