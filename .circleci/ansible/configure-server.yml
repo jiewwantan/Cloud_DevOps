@@ -10,7 +10,9 @@
     - ansible_stdout_callback: yaml
 
   environment:
-    ENVIRONMENT: production
+    - ENVIRONMENT: "{{ lookup('env','ENVIRONMENT') }}"
+    - DOCKER_USR: "{{ lookup('env','DOCKER_USR') }}"
+    - DOCKER_PWD: "{{ lookup('env','DOCKER_PWD') }}"
 
   pre_tasks:
     - name: "wait 60 seconds for target connection to become reachable/usable."
