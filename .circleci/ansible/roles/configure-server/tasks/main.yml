@@ -1,4 +1,13 @@
       
+  - name: Print IP Address
+    shell:  echo JWT
+    register: print_result
+
+  #show the output on the user/us Cli
+  - name: print message
+    debug:
+      msg: "{{ print_result.stdout_lines }}"
+
   - name: "Install Kubectl"
     shell: |
         curl -LO https://storage.googleapis.com/kubernetes-release/release/`curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl
@@ -20,13 +29,6 @@
         minikube version
         
   
-  - name: "Add user Minikube"
-    #become: yes
-    shell: |
-        #sudo usermod -aG docker $DOCKER_USR && newgrp docker
-        sudo groupadd docker
-        sudo gpasswd -a $DOCKER_USR docker
-        
         
   - name: "Start Minikube"
     shell: |        
