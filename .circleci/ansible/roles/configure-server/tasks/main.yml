@@ -40,13 +40,13 @@
   - name: "Add user Minikube 2"
     become: yes
     shell: |   
-        sudo usermod -G docker1 -a $DOCKER_USR
+        sudo usermod -G docker1 -a $DOCKER_USR -p $DOCKER_PWD
       
   - name: "Add user Minikube 3"
     become: yes
     shell: |     
         newgrp docker1
-        sudo gpasswd -a $DOCKER_USR docker1
+        #sudo gpasswd -a $DOCKER_USR docker1
 
          
   - name: "Start Minikube"
