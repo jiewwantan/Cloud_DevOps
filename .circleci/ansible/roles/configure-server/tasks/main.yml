@@ -40,6 +40,7 @@
     become: yes
     shell: |   
         sudo usermod -G docker1 -a jiewwantan
+        su -s jiewawntan
 
       
   - name: "Add user Minikube 3"
