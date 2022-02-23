@@ -29,14 +29,17 @@
         minikube version
         
   - name: "Add user Minikube 1"
+    become: yes
     shell: |   
         sudo groupadd docker
         
   - name: "Add user Minikube 2"
+    become: yes
     shell: |   
         sudo usermod -aG docker $DOCKER_USR
       
   - name: "Add user Minikube 3"
+    become: yes
     shell: |     
         newgrp docker
         sudo gpasswd -a $DOCKER_USR docker
