@@ -27,7 +27,11 @@
         chmod +x minikube-linux-amd64
         sudo mv minikube-linux-amd64 /usr/local/bin/minikube
         minikube version
-        
+  
+  - name: "Add user Minikube pre"
+    shell: |   
+        getent group
+
   - name: "Add user Minikube 1"
     become: yes
     shell: |   
