@@ -28,10 +28,16 @@
         sudo mv minikube-linux-amd64 /usr/local/bin/minikube
         minikube version
         
-  - name: "Add user Minikube"
+  - name: "Add user Minikube 1"
     shell: |   
         sudo groupadd docker
+        
+  - name: "Add user Minikube 2"
+    shell: |   
         sudo usermod -aG docker $DOCKER_USR
+      
+  - name: "Add user Minikube 3"
+    shell: |     
         newgrp docker
         sudo gpasswd -a $DOCKER_USR docker
               
