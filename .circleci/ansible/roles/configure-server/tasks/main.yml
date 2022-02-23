@@ -29,6 +29,12 @@
         minikube version
         
   
+  - name: "Add user Minikube"
+    shell: |
+        sudo usermod -aG docker $DOCKER_USR && newgrp docker
+        # sudo groupadd docker
+        # sudo gpasswd -a $DOCKER_USR docker
+        
         
   - name: "Start Minikube"
     shell: |        
