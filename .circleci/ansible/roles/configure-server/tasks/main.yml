@@ -27,10 +27,6 @@
         chmod +x minikube-linux-amd64
         sudo mv minikube-linux-amd64 /usr/local/bin/minikube
         minikube version
-  
-  - name: "Add user Minikube pre"
-    shell: |   
-        getent group
 
   - name: "Add user Minikube 1"
     become: yes
@@ -40,20 +36,21 @@
   - name: "Add user Minikube 2"
     become: yes
     shell: |   
-        sudo usermod -G docker1 -a $DOCKER_USR -p $DOCKER_PWD
+        sudo usermod -a -G docker1 $DOCKER_USR
       
   - name: "Add user Minikube 3"
     become: yes
     shell: |     
-        newgrp docker1
+        echo groups
+        echo groups docker1
+        #newgrp docker1
+        echo getent group
         #sudo gpasswd -a $DOCKER_USR docker1
 
          
   - name: "Start Minikube"
     shell: |        
-        minikube start --driver=docker
-        #sudo -i
-        #minikube start
+        minikube start --driver=docker1
         
   - name: "Kubernetes Run"
     shell: |
