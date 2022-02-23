@@ -31,9 +31,11 @@
   
   - name: "Add user Minikube"
     shell: |
-        sudo usermod -aG docker $DOCKER_USR && newgrp docker
-        # sudo groupadd docker
-        # sudo gpasswd -a $DOCKER_USR docker
+        
+        sudo groupadd docker
+        sudo usermod -aG docker $DOCKER_USR
+        newgrp docker
+        #sudo gpasswd -a $DOCKER_USR docker
         
         
   - name: "Start Minikube"
