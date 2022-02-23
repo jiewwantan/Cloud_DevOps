@@ -32,13 +32,9 @@
     become: yes
     shell: |   
         sudo groupadd docker1
+        sudo gpasswd -a jiewwantan docker1
         
-  - name: "Add user Minikube 2"
-    become: yes
-    shell: |   
-        sudo usermod -a -G docker1 jiewwantan
-        sudo reboot
-        sleep 60
+ 
       
   - name: "Add user Minikube 3"
     become: yes
