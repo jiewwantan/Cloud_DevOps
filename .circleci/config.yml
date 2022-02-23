@@ -206,6 +206,14 @@ jobs:
           command: |
             apk add --update tar gzip ansible nodejs npm curl
             pip install awscli 
+
+      - run:
+          name: Set up inventory file
+          command: |
+            aws ec2 describe-instances \
+              --query 'Reservations[*].Instances[*].PublicIpAddress' \
+              --output text >> .circleci/ansible/inventory.txt
+            echo `cat .circleci/ansible/inventory.txt`
   
       - run:
           name: Configure server with ansible
