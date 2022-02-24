@@ -28,20 +28,20 @@
         sudo mv minikube-linux-amd64 /usr/local/bin/minikube
         minikube version
 
-  - name: "Add user Minikube 1"
+  - name: "Add group Minikube"
     become: yes
     shell: |   
         sudo groupadd docker1
-        #sudo gpasswd -a jiewwantan docker1
-        #echo groups
-        #echo groups docker1
         
-  - name: "Add user Minikube 2"
+  - name: "Add user Minikube"
     become: yes
     shell: |   
-        sudo usermod -G docker1 -a jiewwantan
-        su -s jiewawntan
+        sudo usermod -aG docker1 jiewwantan
 
+  - name: "Switch to new user Minikube"
+    become: yes
+    shell: |   
+        su -s jiewawntan
       
   - name: "Add user Minikube 3"
     become: yes
@@ -49,10 +49,9 @@
         echo groups
         echo groups docker1
         #newgrp docker1
-        echo getent group
+        getent group
         #sudo gpasswd -a $DOCKER_USR docker1
 
-         
   - name: "Start Minikube"
     shell: |        
         minikube start --driver=docker1
