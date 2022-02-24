@@ -28,10 +28,7 @@
         sudo mv minikube-linux-amd64 /usr/local/bin/minikube
         minikube version
 
-  - name: "Add group Minikube"
-    become: yes
-    shell: |   
-        sudo groupadd docker
+  
         
   - name: "Add user Minikube"
     become: yes
