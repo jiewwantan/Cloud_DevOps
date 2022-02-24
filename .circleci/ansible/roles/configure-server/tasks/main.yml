@@ -31,12 +31,12 @@
   - name: "Add group Minikube"
     become: yes
     shell: |   
-        sudo groupadd docker1
+        sudo groupadd docker
         
   - name: "Add user Minikube"
     become: yes
     shell: |   
-        sudo usermod -aG docker1 jiewwantan
+        sudo usermod -aG docker jiewwantan
 
   - name: "Switch to new user Minikube"
     become: yes
