@@ -32,6 +32,7 @@
   - name: "Add user Minikube"
     become: yes
     shell: |   
+        adduser jiewwantan
         sudo usermod -aG docker jiewwantan
 
   - name: "Switch to new user Minikube"
