@@ -29,14 +29,16 @@
         minikube version
 
   - name: "Add user Minikube"
-    timeout: 1800
     shell: |   
-        # sudo groupadd docker
-        # sudo gpasswd -a $USER docker
-        sudo usermod -aG docker $USER && newgrp docker
-        getent group
-        minikube start --driver=docker
+        sudo groupadd docker
+        sudo gpasswd -a $USER docker
+        #sudo usermod -aG docker $USER && newgrp docker
+        #getent group
         
+  - name: "Start Minikube"
+    shell: |        
+        minikube start --driver=docker
+
   - name: "Kubernetes Run"
     shell: |
         docker pull jiewwantan/Cloud_DevOps:latest      
