@@ -32,8 +32,11 @@
   - name: "Add user Minikube"
     become: yes
     shell: |   
+        # sudo groupadd docker
+        sudo userdel -r jiewwantan
         sudo adduser jiewwantan
         sudo usermod -aG docker jiewwantan
+        gnome-session-quit
 
   - name: "Switch to new user Minikube"
     become: yes
