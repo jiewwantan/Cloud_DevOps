@@ -43,7 +43,7 @@
     shell: |
         docker pull jiewwantan/cloud_devops:latest      
         kubectl run udacity-devops-engineer-capstone-deploy --image=jiewwantan/cloud_devops --port=80 --labels app=udacity-devops-engineer-capstone-deploy
-        #kubectl create deployment udacity-devops-engineer-capstone-deploy2 --image=jiewwantan/Cloud_DevOps 
+        #kubectl create deployment udacity-devops-engineer-capstone-deploy2 --image=jiewwantan/cloud_devops 
         
   - name: "wait 20 seconds for target connection to become reachable/usable."
     wait_for_connection: 

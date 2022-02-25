@@ -5,13 +5,13 @@
 # Step 1:
 # This is your Docker ID/path
 # dockerpath=<>
-dockerpath=jiewwantan/Cloud_DevOps
+dockerpath=jiewwantan/cloud_devops
 
 # Step 2
 # Run the Docker Hub container with kubernetes
-docker pull jiewwantan/Cloud_DevOps:latest
+docker pull jiewwantan/cloud_devops:latest
 kubectl run udacity-devops-engineer-capstone-deploy\
-	    --image=jiewwantan/Cloud_DevOps\
+	    --image=jiewwantan/cloud_devops\
 		--port=80 --labels app=udacity-devops-engineer-capstone-deploy
 
 # Step 3:
