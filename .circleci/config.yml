@@ -147,7 +147,7 @@ jobs:
           name: run build image
           command: |
               docker build --tag=jiewwantan/cloud_devops:latest .
-              echo $ENVIRONMENT | docker login -u $DOCKER_USR --password-stdin
+              echo $ENVIRONMENT | docker login -u=$DOCKER_USR -p="$DOCKER_PWD"
               docker push jiewwantan/cloud_devops:latest
 
 #################################################          
