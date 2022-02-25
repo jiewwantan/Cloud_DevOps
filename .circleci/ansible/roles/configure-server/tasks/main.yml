@@ -34,10 +34,7 @@
     shell: |   
         sudo groupadd docker
         sudo usermod -aG docker $USER && newgrp docker
-
-  - name: "Start Minikube"
-    shell: |        
-        minikube start --driver=docker1
+        minikube start --driver=docker
         
   - name: "Kubernetes Run"
     shell: |
