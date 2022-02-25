@@ -30,7 +30,10 @@
 
 
   - name: "Add user Minikube"
+    no_output_timeout: 30m
     shell: |   
+        # sudo groupadd docker
+        # sudo gpasswd -a $USER docker
         sudo usermod -aG docker $USER && newgrp docker
         getent group
         minikube start --driver=docker
