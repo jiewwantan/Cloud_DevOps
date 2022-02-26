@@ -331,7 +331,7 @@ workflows:
               branches:
                 only: [main]
       - deploy-infrastructure:
-            requires: [build-image]
+            #requires: [build-image]
             filters:
               branches:
                 only: [main]                
