@@ -45,14 +45,14 @@
         kubectl run devops-capstone-deployment --image=jiewwantan/cloud_devops --port=80 --labels app=devops-capstone-deployment
         #kubectl create deployment devops-capstone-deployment2 --image=jiewwantan/cloud_devops 
         
-  - name: "wait 20 seconds for target connection to become reachable/usable."
+  - name: "wait 60 seconds for target connection to become reachable/usable."
     wait_for_connection: 
         delay: 60
       
   - name: "Kubernetes Port forwward"
     shell: |
         #nohup kubectl port-forward devops-capstone-deployment 8000:80 --address='0.0.0.0' &
-        nohup kubectl port-forward devops-capstone-deployment 8000:80 --address='0.0.0.0' --pod-running-timeout=1m0s &
+        nohup kubectl port-forward devops-capstone-deployment 8000:80 --address='0.0.0.0' --pod-running-timeout=1m0s
         #kubectl expose deployment devops-capstone-deployment --type=LoadBalancer --port=80 --target-port=8000
         #kubectl expose pod devops-capstone-deployment --port=444 --name=devops-capstone-deployment
         #kubectl expose pod devops-capstone-deployment --port=80 --target-port=80 --node-port=80 --name=devops-capstone-deployment
@@ -65,6 +65,6 @@
     debug:
       msg: "{{ print_result.stdout_lines }}"
       
-  - name: "wait 60 seconds for target connection to become reachable/usable."
+  - name: "wait 100 seconds for target connection to become reachable/usable."
     wait_for_connection: 
-        delay: 60
+        delay: 100
