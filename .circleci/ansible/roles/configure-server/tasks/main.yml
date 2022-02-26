@@ -42,8 +42,8 @@
   - name: "Kubernetes Run"
     shell: |
         docker pull jiewwantan/cloud_devops:latest      
-        kubectl run udacity-devops-engineer-capstone-deploy --image=jiewwantan/cloud_devops --port=80 --labels app=udacity-devops-engineer-capstone-deploy
-        #kubectl create deployment udacity-devops-engineer-capstone-deploy2 --image=jiewwantan/cloud_devops 
+        kubectl run devops-capstone-deployment --image=jiewwantan/cloud_devops --port=80 --labels app=devops-capstone-deployment
+        #kubectl create deployment devops-capstone-deployment2 --image=jiewwantan/cloud_devops 
         
   - name: "wait 20 seconds for target connection to become reachable/usable."
     wait_for_connection: 
@@ -51,11 +51,11 @@
       
   - name: "Kubernetes Port forwward"
     shell: |
-        #nohup kubectl port-forward udacity-devops-engineer-capstone-deploy 8000:80 --address='0.0.0.0' &
-        nohup kubectl port-forward udacity-devops-engineer-capstone-deploy 8000:80 --address='0.0.0.0' --pod-running-timeout=1m0s &
-        #kubectl expose deployment udacity-devops-engineer-capstone-deploy2 --type=LoadBalancer --port=80 --target-port=8000
-        #kubectl expose pod udacity-devops-engineer-capstone-deploy --port=444 --name=udacity-devops-engineer-capstone-deploy
-        #kubectl expose pod udacity-devops-engineer-capstone-deploy --port=80 --target-port=80 --node-port=80 --name=udacity-devops-engineer-capstone-deploy
+        #nohup kubectl port-forward devops-capstone-deployment 8000:80 --address='0.0.0.0' &
+        nohup kubectl port-forward devops-capstone-deployment 8000:80 --address='0.0.0.0' --pod-running-timeout=1m0s &
+        #kubectl expose deployment devops-capstone-deployment --type=LoadBalancer --port=80 --target-port=8000
+        #kubectl expose pod devops-capstone-deployment --port=444 --name=devops-capstone-deployment
+        #kubectl expose pod devops-capstone-deployment --port=80 --target-port=80 --node-port=80 --name=devops-capstone-deployment
 
         #echo "nohup applied"
         #cat nohup.out
