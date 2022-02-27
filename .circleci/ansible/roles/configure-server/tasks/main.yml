@@ -49,21 +49,11 @@
     wait_for_connection: 
         delay: 30
 
-  - name: "apply service"
-    shell: |
-        echo "Script executed from: ${PWD}"
-        echo "locate: ${locate service.yml}"
-        kubectl apply -f project/.circleci/ansible/service.yml
   
-  - name: wait for pods to up
-    wait_for: 
-      delay: 60 
-      timeout: 0 
-
   - name: "Kubernetes Port forwward"
     shell: |
-        #nohup kubectl -n port-forward devops-capstone-deployment 8000:80 --address='0.0.0.0' --pod-running-timeout=5m0s &
-        kubectl -n port-forward devops-capstone-deployment 8000:80 --address='0.0.0.0' service/simple-api
+        nohup kubectl -n port-forward devops-capstone-deployment 8000:80 --address='0.0.0.0' --pod-running-timeout=5m0s &
+        #kubectl -n port-forward devops-capstone-deployment 8000:80 --address='0.0.0.0' service/simple-api
         #echo -ne '\n' 
         #echo "nohup applied"
         #cat nohup.out
