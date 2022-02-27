@@ -50,7 +50,7 @@
         delay: 30
 
   - name: "apply service"
-    shell:  kubectl apply -f /home/ubuntu/repo/k8s/service.yml
+    shell:  kubectl apply -f ../../../../service.yml
   
   - name: wait for pods to up
     wait_for: 
