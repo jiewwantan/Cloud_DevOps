@@ -53,6 +53,13 @@
     shell: |
         #nohup kubectl port-forward devops-capstone-deployment 8000:80 --address='0.0.0.0' &
         nohup kubectl port-forward devops-capstone-deployment 8000:80 --address='0.0.0.0' --pod-running-timeout=5m0s &
+        if [ $? -ne 0 ]; then
+            echo "Unable to start port forwarding to node devops-capstone-deployment on port 8000"
+            exit 1
+        fi
+        PORT_FORWARD_PID=$!
+
+        sleep 10
         #fg
         #kubectl port-forward devops-capstone-deployment 8000:80 --address='0.0.0.0' --pod-running-timeout=1m0s
         #kubectl expose deployment devops-capstone-deployment --type=LoadBalancer --port=80 --target-port=8000
