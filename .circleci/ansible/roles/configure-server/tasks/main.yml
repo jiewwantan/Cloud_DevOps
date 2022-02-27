@@ -62,19 +62,7 @@
 
         echo "nohup applied"
         #cat nohup.out
-
-  - name: "Reset Kubernetes port forward to counter Curel (56) Recv failure: Connection reset by peer"
-    shell: |
-
-      BACKEND_IP=$(aws ec2 describe-instances \
-        --query "Reservations[*].Instances[*].PublicIpAddress" \
-        --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" \
-        --output=text)
-      export API_URL="http://${BACKEND_IP}:8000"
-      echo "${API_URL}"
-      sleep 10
-      curl "${API_URL}"
-      nohup kubectl port-forward devops-capstone-deployment 8000:80 --address='0.0.0.0' --pod-running-timeout=15m0s &
+  
       
   - name: "wait 60 seconds for target connection to become reachable/usable."
     wait_for_connection: 
