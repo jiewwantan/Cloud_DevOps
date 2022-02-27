@@ -50,7 +50,9 @@
         delay: 30
 
   - name: "apply service"
-    shell:  kubectl apply -f project/.circleci/ansible/service.yml
+    shell: |
+        echo "Script executed from: ${PWD}"
+        kubectl apply -f /project/.circleci/ansible/service.yml
   
   - name: wait for pods to up
     wait_for: 
