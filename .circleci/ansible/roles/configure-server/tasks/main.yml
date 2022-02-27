@@ -51,7 +51,7 @@
       
   - name: "Kubernetes Port forwward"
     shell: |
-        nohup kubectl port-forward devops-capstone-deployment 8000:80 --address='0.0.0.0' --pod-running-timeout=5m0s &
+        nohup kubectl -n port-forward devops-capstone-deployment 8000:80 --address='0.0.0.0' --pod-running-timeout=5m0s &
         echo -ne '\n' 
         echo "nohup applied"
         #cat nohup.out
