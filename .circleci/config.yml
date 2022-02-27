@@ -245,8 +245,7 @@ jobs:
               --output=text)
             export API_URL="http://${BACKEND_IP}:8000"
             echo "${API_URL}"
-            sleep 30
-            echo "$(curl --silent -I "${API_URL}")"
+            echo "$(curl --silent -I "${API_URL}")" || true
             nohup kubectl port-forward devops-capstone-deployment 8000:80 --address='0.0.0.0' --pod-running-timeout=15m0s &
             echo -ne '\n'
             echo "nohup applied"
@@ -309,32 +308,32 @@ workflows:
       - print-workflow-id:
             filters:
               branches:
-                only: [main]
+                only: [dev]
       - lint-Python:
             requires: [print-workflow-id]
             filters:
               branches:
-                only: [main]
+                only: [dev]
       - lint-Dockerfile:
             requires: [print-workflow-id]
             filters:
               branches:
-                only: [main]
+                only: [dev]
       - test-app:
             requires: [lint-Python, lint-Dockerfile]
             filters:
               branches:
-                only: [main]
+                only: [dev]
       - security-app:
             requires: [test-app]
             filters:
               branches:
-                only: [main] 
+                only: [dev]
       - build-image:
             requires: [security-app]
             filters:
               branches:
-                only: [main]
+                only: [dev]
       - deploy-infrastructure:
             #requires: [build-image]
             filters:
