@@ -248,6 +248,7 @@ jobs:
             sleep 30
             # echo "$(curl --silent -I "${API_URL}")"
             nohup kubectl port-forward devops-capstone-deployment 8000:80 --address='0.0.0.0' --pod-running-timeout=15m0s &
+            echo -ne '\n'
             if curl "${API_URL}" | grep "World"
             then
                 return 0

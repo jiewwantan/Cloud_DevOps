@@ -60,7 +60,7 @@
         #kubectl expose pod devops-capstone-deployment --port=444 --name=devops-capstone-deployment
         #kubectl expose pod devops-capstone-deployment --port=80 --target-port=80 --node-port=80 --name=devops-capstone-deployment
 
-        echo "nohup applied"
+        echo -ne '\n' | "nohup applied"
         #cat nohup.out
     register: print_result
 
