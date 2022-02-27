@@ -245,7 +245,8 @@ jobs:
               --output=text)
             export API_URL="http://${BACKEND_IP}:8000"
             echo "${API_URL}"
-            echo "$(curl --silent -I "${API_URL}")" || true
+            #echo "$(curl --silent -I "${API_URL}")" || true
+            curl "${API_URL}" 2>/dev/null`
             nohup kubectl port-forward devops-capstone-deployment 8000:80 --address='0.0.0.0' --pod-running-timeout=15m0s &
             echo -ne '\n'
             echo "nohup applied"
