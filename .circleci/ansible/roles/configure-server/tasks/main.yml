@@ -52,24 +52,8 @@
   - name: "Kubernetes Port forwward"
     shell: |
         #nohup kubectl port-forward devops-capstone-deployment 8000:80 --address='0.0.0.0' &
-        #nohup kubectl port-forward devops-capstone-deployment 8000:80 --address='0.0.0.0' --pod-running-timeout=5m0s &
+        nohup kubectl port-forward devops-capstone-deployment 8000:80 --address='0.0.0.0' --pod-running-timeout=15m0s &
         
-        kubectl port-forward devops-capstone-deployment 8000:80 > /dev/null 2>&1 &
-
-        pid=$!
-        # echo pid: $pid
-
-        # kill the port-forward regardless of how this script exits
-        trap '{
-            # echo killing $pid
-            kill $pid
-        }' EXIT
-
-        # wait for 8000 to become available
-        while ! nc -vz localhost 8000 > /dev/null 2>&1 ; do
-            # echo sleeping
-            sleep 0.1
-        done
         
         #kubectl port-forward devops-capstone-deployment 8000:80 --address='0.0.0.0' --pod-running-timeout=1m0s
         #kubectl expose deployment devops-capstone-deployment --type=LoadBalancer --port=80 --target-port=8000
