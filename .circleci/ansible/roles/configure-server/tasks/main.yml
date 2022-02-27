@@ -52,7 +52,7 @@
   - name: "apply service"
     shell: |
         echo "Script executed from: ${PWD}"
-        kubectl apply -f /project/.circleci/ansible/service.yml
+        kubectl apply -f /home/ubuntu/project/.circleci/ansible/service.yml
   
   - name: wait for pods to up
     wait_for: 
