@@ -67,6 +67,6 @@
     debug:
       msg: "{{ print_result.stdout_lines }}"
       
-  - name: "wait 100 seconds for target connection to become reachable/usable."
+  - name: "wait 60 seconds for target connection to become reachable/usable."
     wait_for_connection: 
-        delay: 100
+        delay: 60
