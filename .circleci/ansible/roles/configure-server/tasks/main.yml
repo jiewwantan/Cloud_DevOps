@@ -48,14 +48,26 @@
   - name: "wait 30 seconds for target connection to become reachable/usable."
     wait_for_connection: 
         delay: 30
-      
+
+  - name: "apply service"
+    shell:  kubectl apply -f .circleci/ansible/service.yml
+  
+  - name: wait for pods to up
+    wait_for: 
+      delay: 60 
+      timeout: 0 
+
   - name: "Kubernetes Port forwward"
     shell: |
-        nohup kubectl -n port-forward devops-capstone-deployment 8000:80 --address='0.0.0.0' --pod-running-timeout=5m0s &
-        echo -ne '\n' 
-        echo "nohup applied"
+        #nohup kubectl -n port-forward devops-capstone-deployment 8000:80 --address='0.0.0.0' --pod-running-timeout=5m0s &
+        kubectl -n port-forward devops-capstone-deployment 8000:80 --address='0.0.0.0' service/simple-api
+        #echo -ne '\n' 
+        #echo "nohup applied"
         #cat nohup.out
-    register: print_result
+    async: 2592000
+    poll: 0
+
+    #register: print_result
 
   - name: print message
     debug:
@@ -64,3 +76,31 @@
   - name: "wait 60 seconds for target connection to become reachable/usable."
     wait_for_connection: 
         delay: 60
+
+
+
+  - name: Deploy kubernetes
+  hosts: server
+  gather_facts: True
+  become: true
+  tasks:
+  - git:
+      repo: https://github.com/metanitesh/metanitesh-CI.CD.Jenkins.Ansible.Docker.K8s.git
+      dest: /home/ubuntu/repo
+      version: green-deployment
+  
+  - name: apply deployments
+    shell:  kubectl apply -f /home/ubuntu/repo/k8s/deployment.yml
+
+  - name: apply service
+    shell:  kubectl apply -f /home/ubuntu/repo/k8s/service.yml
+
+  - name: wait for pods to up
+    wait_for: 
+      delay: 60 
+      timeout: 0 
+
+  - name: port-forward
+    shell: kubectl port-forward --address 0.0.0.0 service/simple-api 3000:3000
+    async: 2592000
+    poll: 0
