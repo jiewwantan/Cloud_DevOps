@@ -43,7 +43,7 @@
   # SSH to EC2 instance terminal 
   # Run curl soon after this step "Kubernetes Port forwward" is finished in CircleCI 
   # Obtain instance's public IP and run >1 curl http://xxx.xxx.xxx.xxx:8000
-  # Terminal will show failure curl: (56) or curl: (56)
+  # Terminal will show failure curl: (7) or curl: (56)
   # Rerun the following nohup command in terminal
   # Run curl again, it should be successful
 
