@@ -63,9 +63,7 @@
         nohup kubectl -n port-forward devops-capstone-deployment 8000:80 --address='0.0.0.0' --pod-running-timeout=5m0s &
         #kubectl -n port-forward devops-capstone-deployment 8000:80 --address='0.0.0.0' service/simple-api
         #echo -ne '\n'      
-    async: 2592000
-    poll: 0
-
+    
   - name: "wait 30 seconds for target connection to become reachable/usable."
     wait_for_connection: 
         delay: 30
