@@ -65,12 +65,7 @@
         #echo -ne '\n'      
     async: 2592000
     poll: 0
-    register: print_result
 
-  - name: print message
-    debug:
-      msg: "{{ print_result.stdout_lines }}"
-      
   - name: "wait 30 seconds for target connection to become reachable/usable."
     wait_for_connection: 
         delay: 30
