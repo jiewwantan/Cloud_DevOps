@@ -1,6 +1,6 @@
 # Simple Hello World app to demonstrate DevOps for a cloud native application
 
-## CircleCI
+## CircleCI Status Badges
 [![CircleCI](https://circleci.com/gh/jiewwantan/Cloud_DevOps/tree/main.svg?style=svg)](https://circleci.com/gh/jiewwantan/Cloud_DevOps/tree/main)
 
 ## Abstract
