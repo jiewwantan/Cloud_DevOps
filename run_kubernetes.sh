@@ -3,8 +3,6 @@
 # This tags and uploads an image to Docker Hub
 
 # Step 1:
-# This is your Docker ID/path
-# dockerpath=<>
 dockerpath=jiewwantan/cloud_devops
 
 # Step 2
@@ -15,9 +13,9 @@ kubectl run devops-capstone-deployment\
 		--port=80 --labels app=devops-capstone-deployment
 
 # Step 3:
-# List kubernetes pods
+# Get kubernetes pods
 kubectl get pods
 
 # Step 4:
-# Forward the container port to a host
+# Forward the container port to host
 kubectl port-forward devops-capstone-deployment 8000:80
