@@ -8,8 +8,8 @@ This is a simple python app to demonstrate DevOps process with the basic feature
 CircleCI is used as the continuous integration pipeline tool.
 
 ## Deployment Method
-Blue green deployment method is adopted where there are a main and dev deployment 
-Updates are launched on dev. When the deployment is satisfactory then only the main branch will be replaced with the new update. 
+Blue green deployment method is adopted where there are a main and dev deployments.  
+Updates are launched on dev. When the deployment is satisfactory then traffic will be transferred to the new deployment.
 
 
 ## Linting for Python
