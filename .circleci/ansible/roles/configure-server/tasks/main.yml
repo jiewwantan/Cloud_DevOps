@@ -19,7 +19,7 @@
         sudo mv minikube-linux-amd64 /usr/local/bin/minikube
         minikube version
 
-  - name: "Add user Minikube"
+  - name: "Add user for Minikube"
     shell: |   
         sudo groupadd docker
         sudo gpasswd -a $USER docker
@@ -41,6 +41,13 @@
       
   - name: "Kubernetes Port forwward"
     shell: |
+        # if smoke test failed with curl: (56) Recv failure: Connection reset by peer
+        # SSH to EC2 instance terminal 
+        # Run curl soon after this step "Kubernetes Port forwward" is finished in CircleCI 
+        # Obtain instance's public IP and run >1 curl http://xxx.xxx.xxx.xxx:8000
+        # Terminal will show failure curl: (56) Recv failure: Connection reset by peer
+        # Rerun the following nohup command in terminal
+        # Run curl again, it should be successful
         nohup kubectl port-forward devops-capstone-deployment 8000:80 --address='0.0.0.0' --pod-running-timeout=15m0s &
     register: record_nohup_output
 
@@ -50,4 +57,4 @@
       
   - name: "wait 60 seconds for target connection to become reachable/usable."
     wait_for_connection: 
-        delay: 120
+        delay: 60
