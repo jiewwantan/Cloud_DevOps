@@ -51,7 +51,7 @@
 
   - name: "apply service"
     shell: |
-        kubectl apply -f /home/ubuntu/repo/ansible/service.yml
+        kubectl apply -f /home/ubuntu/repo/k8s/service.yml
   
   - name: wait for pods to up
     wait_for: 
