@@ -45,25 +45,26 @@
         kubectl run devops-capstone-deployment --image=jiewwantan/cloud_devops --port=80 --labels app=devops-capstone-deployment
         #kubectl create deployment devops-capstone-deployment2 --image=jiewwantan/cloud_devops 
         
-  #- name: "wait 30 seconds for target connection to become reachable/usable."
-  #  wait_for_connection: 
-  #      delay: 30
+  - name: "wait 30 seconds for target connection to become reachable/usable."
+    wait_for_connection: 
+        delay: 30
 
   #- name: "apply service"
   #  shell: |
   #      kubectl apply -f /home/ubuntu/repo/k8s/service.yml
-  
-  - name: "wait 30 seconds for target connection to become reachable/usable"
-    wait_for: 
-      delay: 30 
-      timeout: 0 
 
   - name: "Kubernetes Port forwward"
     shell: |
-        nohup kubectl -n port-forward devops-capstone-deployment 8000:80 --address='0.0.0.0' --pod-running-timeout=5m0s &
+        nohup kubectl -n port-forward devops-capstone-deployment 8000:80 --address='0.0.0.0' --pod-running-timeout=15m0s &
         #kubectl -n port-forward devops-capstone-deployment 8000:80 --address='0.0.0.0' service/simple-api
-        #echo -ne '\n'      
+        #echo -ne '\n'    
+        echo "nohup applied"  
+    register: print_result
+
+  - name: print message
+    debug:
+      msg: "{{ print_result.stdout_lines }}"
     
-  - name: "wait 30 seconds for target connection to become reachable/usable."
+  - name: "wait 60 seconds for target connection to become reachable/usable."
     wait_for_connection: 
-        delay: 30
+        delay: 60
