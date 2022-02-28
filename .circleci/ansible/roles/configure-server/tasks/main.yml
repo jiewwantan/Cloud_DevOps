@@ -1,13 +1,4 @@
       
-  - name: Print IP Address
-    shell:  echo JWT
-    register: print_result
-
-  #show the output on the user/us Cli
-  - name: print message
-    debug:
-      msg: "{{ print_result.stdout_lines }}"
-
   - name: "Install Kubectl"
     shell: |
         curl -LO https://storage.googleapis.com/kubernetes-release/release/`curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl
@@ -43,8 +34,7 @@
     shell: |
         docker pull jiewwantan/cloud_devops:latest      
         kubectl run devops-capstone-deployment --image=jiewwantan/cloud_devops --port=80 --labels app=devops-capstone-deployment
-        #kubectl create deployment devops-capstone-deployment2 --image=jiewwantan/cloud_devops 
-        
+       
   - name: "wait 20 seconds for target connection to become reachable/usable."
     wait_for_connection: 
         delay: 20
@@ -52,13 +42,11 @@
   - name: "Kubernetes Port forwward"
     shell: |
         nohup kubectl port-forward devops-capstone-deployment 8000:80 --address='0.0.0.0' --pod-running-timeout=15m0s &
-        echo "nohup applied"
-        #cat nohup.out
-    register: print_result
+    register: record_nohup_output
 
-  - name: print message
+  - name: print nohup output
     debug:
-      msg: "{{ print_result.stdout_lines }}"
+      msg: "{{ record_nohup_output.stdout_lines }}"
       
   - name: "wait 60 seconds for target connection to become reachable/usable."
     wait_for_connection: 
