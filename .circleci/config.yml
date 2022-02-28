@@ -304,34 +304,34 @@ workflows:
       - print-workflow-id:
             filters:
               branches:
-                only: [dev]
+                only: [main]
       - lint-Python:
             requires: [print-workflow-id]
             filters:
               branches:
-                only: [dev]
+                only: [main]
       - lint-Dockerfile:
             requires: [print-workflow-id]
             filters:
               branches:
-                only: [dev]
+                only: [main]
       - test-app:
             requires: [lint-Python, lint-Dockerfile]
             filters:
               branches:
-                only: [dev]
+                only: [main]
       - security-app:
             requires: [test-app]
             filters:
               branches:
-                only: [dev]
+                only: [main] 
       - build-image:
             requires: [security-app]
             filters:
               branches:
-                only: [dev]
+                only: [main]
       - deploy-infrastructure:
-            #requires: [build-image]
+            requires: [build-image]
             filters:
               branches:
                 only: [main]                
