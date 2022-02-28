@@ -256,49 +256,49 @@ workflows:
       - print-workflow-id:
             filters:
               branches:
-                only: [main]
+                only: [dev]
       - python-linting:
             requires: [print-workflow-id]
             filters:
               branches:
-                only: [main]
+                only: [dev]
       - docker-linting:
             requires: [print-workflow-id]
             filters:
               branches:
-                only: [main]
+                only: [dev]
       - test-app:
             requires: [python-linting, docker-linting]
             filters:
               branches:
-                only: [main]
+                only: [dev]
       - security-app:
             requires: [test-app]
             filters:
               branches:
-                only: [main] 
+                only: [dev] 
       - build-image:
             requires: [security-app]
             filters:
               branches:
-                only: [main]
+                only: [dev]
       - deploy-infrastructure:
             requires: [build-image]
             filters:
               branches:
-                only: [main]                
+                only: [dev]                
       - configure-infrastructure:
             requires: [deploy-infrastructure]
             filters:
               branches:
-                only: [main]
+                only: [dev]
       - smoke-test:
             requires: [configure-infrastructure]
             filters:
               branches:
-                only: [main]   
+                only: [dev]   
       - cleanup:
             requires: [smoke-test]
             filters:
               branches:
-                only: [main]   
+                only: [dev]   
