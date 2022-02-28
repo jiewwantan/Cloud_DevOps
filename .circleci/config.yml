@@ -1,13 +1,8 @@
-# Use the latest 2.1 version of CircleCI pipeline process engine.
-# See: https://circleci.com/docs/2.0/configuration-reference
 version: 2.1
-
-
 commands:
   destroy-environment:
-    description: Destroy Udacity-DevOps-Engineer-Capstone cloudformation stacks given a workflow ID.
-    parameters:
-      # Add parameter here  
+    description: Destroy cloudformation stack in case of failure
+    parameters: 
       workflow_id:
         type: string
     steps:
@@ -16,19 +11,17 @@ commands:
           when: on_fail
           command: |
             echo "Destroying environment udapeople-${CIRCLE_WORKFLOW_ID:0:7}"
-            #aws cloudformation delete-stack --stack-name back-end-${CIRCLE_WORKFLOW_ID:0:7}
-
+           
   print_pipeline_id:
-    description: "A very simple command to print workflow ID"
+    description: "Print workflow ID"
     parameters:
       id:
         type: string
     steps:
       - run:
-          name: "print workflow ID"
+          name: "Print Workflow ID"
           command: echo <<parameters.id>>
       
-
 jobs:
   print-workflow-id:
     docker:
@@ -38,9 +31,8 @@ jobs:
       - print_pipeline_id:
           id: <<pipeline.id>>
           
-  lint-Python:
+  python-linting:
     docker:
-      # specify the version you desire here
       - image: python:3.7.3-stretch
     working_directory: ~/repo
     steps:
@@ -51,22 +43,18 @@ jobs:
             python3 -m venv venv
             . venv/bin/activate
             pip install -r requirements.txt
-      # run lints!
       - run:
           name: run python lint
           command: |
             . venv/bin/activate
             pylint --disable=R,C,W1203,W1202 app.py
             
-  lint-Dockerfile:
+  docker-linting:
     docker:
       - image: python:3.7.3-stretch
-
     working_directory: ~/repo
-
     steps:
       - checkout
-
       - run:
           name: install dependencies
           command: |
@@ -75,19 +63,14 @@ jobs:
             #install hadolint
             wget -O /bin/hadolint https://github.com/hadolint/hadolint/releases/download/v1.16.3/hadolint-Linux-x86_64
             chmod +x /bin/hadolint
-        
-      # run lints!
       - run:
           name: run docker lint
           command: |
             . venv/bin/activate
             hadolint Dockerfile
 
-#################################################
-
   test-app:
     docker:
-      # specify the version you desire here
       - image: python:3.7.3-stretch
     working_directory: ~/repo
     steps:
@@ -98,18 +81,14 @@ jobs:
             python3 -m venv venv
             . venv/bin/activate
             pip install -r requirements.txt
-      # run lints!
       - run:
           name: run pytest app.py
           command: |
             . venv/bin/activate
             pytest test_api.py
 
-#################################################
-
   security-app:
     docker:
-      # specify the version you desire here
       - image: python:3.7.3-stretch
     working_directory: ~/repo
     steps:
@@ -120,29 +99,25 @@ jobs:
             python3 -m venv venv
             . venv/bin/activate
             pip install -r requirements.txt
-      # run lints!
       - run:
           name: run security test bandit app.py
           command: |
             . venv/bin/activate
             bandit app.py --skip B104,B201
-#################################################
 
   build-image:
     docker:
       - image: circleci/golang:1.15
         auth:
           username: $DOCKER_USR
-          password: $DOCKER_PWD  # context / project UI env-var reference
+          password: $DOCKER_PWD 
     steps:
       - checkout
-      # ... steps for building/testing app ...
-
       - setup_remote_docker:
           version: 19.03.13
           docker_layer_caching: true
 
-      # build and push Docker image
+      # Build and push Docker image to Docker repository
       - run: 
           name: run build image
           command: |
@@ -150,13 +125,11 @@ jobs:
               echo $ENVIRONMENT | docker login -u=$DOCKER_USR -p="$DOCKER_PWD"
               docker push jiewwantan/cloud_devops:latest
 
-#################################################          
+    
   deploy-infrastructure:
     docker:
-      # Docker image here that supports AWS CLI
       - image: amazon/aws-cli
     steps:
-      # Checkout code from git
       - checkout
       - run:
           name: Install tar
@@ -169,7 +142,6 @@ jobs:
               --tags project=Udacity-DevOps-Capstone \
               --stack-name "back-end-${CIRCLE_WORKFLOW_ID:0:7}" \
               --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"  
-              #exit 1
       
       - run:
           name: Add EC2 ip to ansible inventory
@@ -194,16 +166,13 @@ jobs:
       - checkout
       - add_ssh_keys:
            fingerprints: ["0a:e9:05:66:80:4b:67:9c:a5:60:7e:59:71:49:6b:c7"]
-  
       - attach_workspace:    
-         at: ~/project
-       
+         at: ~/project   
       - run:
           name: Install dependencies
           command: |
             apk add --update tar gzip ansible nodejs npm curl
             pip install awscli 
-
       - run:
           name: Set up inventory file
           command: |
@@ -214,26 +183,20 @@ jobs:
   
       - run:
           name: Configure server with ansible
-          #no_output_timeout: 3m
           command: |
             echo "Start Ansible"
             cd .circleci/ansible
             ansible-playbook -i inventory.txt configure-server.yml
             cat inventory.txt
-            #cat configure-server.yml
-      # Here's where you will add some code to rollback on failure  
       
   smoke-test:
     docker:
-      # Lightweight Docker image 
       - image: python:3.7-alpine3.11
     steps:
-      # Checkout code from git
       - checkout
       - run:
           name: Install dependencies
           command: |
-            # your code here
             apk add --update tar gzip ansible nodejs npm curl zip
             pip install awscli
       - run:
@@ -252,17 +215,15 @@ jobs:
             else
                 return 1
             fi
-      # Here's where you will add some code to rollback on failure delete new env 
+      # Rollback upon failure
       - destroy-environment:
           workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}        
             
           
   cleanup:
       docker:
-        # Docker image here that supports AWS CLI
         - image: amazon/aws-cli
       steps:
-        # Checkout code from git
         - checkout
         - run:
             name: Install dependencies
@@ -273,12 +234,7 @@ jobs:
         - run:
             name: Get old stack workflow id
             command: |
-              # your code here will get all stack names including the new one
-              #export OldWorkflowID=$(aws cloudformation list-exports --query "Exports[?Name==\`WorkflowID\`].Value" --no-paginate --output text)
-              #echo OldWorkflowID: "${OldWorkflowID}"
-              #put the list of stacks here
               export STACKS=($(aws cloudformation list-stacks --query "StackSummaries[*].StackName" --stack-status-filter CREATE_COMPLETE --no-paginate --output text))
-              #echo Stacks: ${STACKS[@]}
               for stack in ${STACKS[@]}; do
                   if [[ $stack == *"${CIRCLE_WORKFLOW_ID:0:7}"* ]]
                     then
@@ -290,9 +246,6 @@ jobs:
                         echo "$stack"
                         export OldWorkflowID=${stack##*-}
                         echo $OldWorkflowID
-                        #aws cloudformation delete-stack --stack-name "back-end-${OldWorkflowID}"
-                        #aws s3 rm "s3://udapeople-${OldWorkflowID}" --recursive
-                        #aws cloudformation delete-stack --stack-name "front-end-${OldWorkflowID}"
                       fi
                   fi
               done
@@ -305,18 +258,18 @@ workflows:
             filters:
               branches:
                 only: [main]
-      - lint-Python:
+      - python-linting:
             requires: [print-workflow-id]
             filters:
               branches:
                 only: [main]
-      - lint-Dockerfile:
+      - docker-linting:
             requires: [print-workflow-id]
             filters:
               branches:
                 only: [main]
       - test-app:
-            requires: [lint-Python, lint-Dockerfile]
+            requires: [python-linting, docker-linting]
             filters:
               branches:
                 only: [main]

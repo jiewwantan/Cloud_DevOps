@@ -1,40 +1,37 @@
+# Simple Hello World app to demonstrate DevOps for a cloud native application
+
 ## CircleCI
 [![CircleCI](https://circleci.com/gh/jiewwantan/Cloud_DevOps/tree/main.svg?style=svg)](https://circleci.com/gh/jiewwantan/Cloud_DevOps/tree/main)
 
 ## Abstract
-This simple python code is used to illustrate the main ideas for DevOps and cloud native applicaitons.
-I used CircleCI for my pipeline which follow the below steps (all screenshots could be found in Udacity-DevOps-Engineer-Capstone SC.pdf)
-the project has 2 braches 
-dev
-where all teh changes related to teh code and scanning are initiatted
-main
-for the delpoyment
+This is a simple python app to demonstrate DevOps process with the basic feature of a cloud native applicaitons.
+CircleCI is used as the continuous integration pipeline tool.
 
-## Lint code
-the first step of the pipeline is to check the code syntax which is done by pylint
+## Linting for Python
+Initially, all Python code syntax are checked by pylint.
 
-## Lint Docker
-Then check the docker file for any typos by hadolint
+## Linting for Docker
+Following, dockerfil is being checked by hadolint.
 
-## Test App
-The i used pytest to test the flask app I am running
+## Testing for App
+The Flask app is then tested by pytest.
 
-## Security test
-Used bandit to scan my python code for vulnerabilities
+## Testing for security
+Potential Python code vulnerabilities are scanned by Bandit.
 
-## Build image
-After all the tests are complete I used CircleCI to build my container image and publish it to docker hub with the latest tag
+## Building image
+The building of the appp into container and pushing the container to Docker Hub are conducted by CircleCI pipeline.
 
-## Build Infra
-Using the cloudformation power I created the required server to run my application in prod
+## Building Infrastructure
+The essential cloud service resources are assembled by cloudformation into a stack sitting in the AWS cloud.
 
-## Configure Infra
-Using Ansible i confiured minikube and Kubectl to run my application inside a Kubernetes cluster
+## Configuring Infrastructure
+The automation of shell commands so that deployment can be replicated with ease is configured using Ansible 
+In the configuration minikube and Kubectl are installed and configured for execution of the Hello app in a Kubernetes cluster
 
 ## Smoke test
-Finalling using curl to the new server services. 
-I created an testing scenario to make sure the new infra is working fine or delete it using the destroy-environment command from before deleting the old one.
-In case it fails it will delete the new infrastructure to save cost
+Before the CI pipelines, smoke test is conducted to ensure the container(s) are properly configure and that its service can be accessed by curl.
+Should there be any failure, the built environment will be destroyed to avoid unnecessary charges. 
 
-## Clean up
-Automatically deleting the old infra to save cost
+## Cleaning up
+Deleting old cloud resources
