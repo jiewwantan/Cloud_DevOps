@@ -43,10 +43,10 @@
   # SSH to EC2 instance terminal 
   # Run curl soon after this step "Kubernetes Port forwward" is finished in CircleCI 
   # Obtain instance's public IP and run >1 curl http://xxx.xxx.xxx.xxx:8000
-  # Terminal will show failure curl: (56) Recv failure: Connection reset by peer
+  # Terminal will show failure curl: (56) or curl: (56)
   # Rerun the following nohup command in terminal
   # Run curl again, it should be successful
-  
+
   - name: "Kubernetes Port forwward"
     shell: |
         nohup kubectl port-forward devops-capstone-deployment 8000:80 --address='0.0.0.0' --pod-running-timeout=15m0s &
